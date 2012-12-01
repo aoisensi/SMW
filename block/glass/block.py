@@ -7,5 +7,6 @@ class Block_glass(object):
     def get_picture(self):
         return self.image
     def get_collision(self, x, y):
-        return 5
+        collision = Collision()
+        return collision
 block_class = Block_glass

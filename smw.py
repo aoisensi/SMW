@@ -15,6 +15,22 @@ from pygame.locals import *
 import sys
 import os
 
+class Collision(object):
+    left = False
+    right = False
+    up = False
+    down = False
+    def __init__(self):
+        self.left = False
+        self.right = False
+        self.up = False
+        self.down = False
+    def _not_ander(self, left, right, up, down):
+        self.left = self.left and (not left)
+        self.right = self.right and (not right)
+        self.up = self.up and (not up)
+        self.down = self.down and (not down)
+
 class BlockClasses(object):
     block_classes = {}   #dictonary <string, class>
     @staticmethod
@@ -56,94 +72,21 @@ class Stage(object):
     def _get_collision_natural(self, x, y):
         block = self.get_block(int(x/16),int(y/16))
         if block == None:
-            return 5
+            return Collision()
         else:
             return block.get_collision(x%16, y%16)
 
     def get_collision(self, x, y):
         collision = self._get_collision_natural(x, y)
-        if collision == 1:
-            _collision = self._get_collision_natural(x - 1, y)
-            if(_collision == 3 or _collision == 6 or _collision == 9):
-                _collision = self._get_collision_natural(x, y + 1)
-                if(_collision == 7 or _collision == 8 or _collision == 9):
-                    return 5
-                else:
-                    return 2
-            else:
-                _collision = self._get_collision_natural(x, y + 1)
-                if(_collision == 7 or _collision == 8 or _collision == 9):
-                    return 4
-                else:
-                    return 1
-        elif collision == 2:
-            _collision = self._get_collision_natural(x, y + 1)
-            if(_collision == 7 or _collision == 8 or _collision == 9):
-                return 5
-            else:
-                return 2
-        elif collision == 3:
-            _collision = self._get_collision_natural(x + 1, y)
-            if(_collision == 1 or _collision == 4 or _collision == 7):
-                _collision = self._get_collision_natural(x, y + 1)
-                if(_collision == 7 or _collision == 8 or _collision == 9):
-                    return 5
-                else:
-                    return 2
-            else:
-                _collision = self._get_collision_natural(x, y + 1)
-                if(_collision == 7 or _collision == 8 or _collision == 9):
-                    return 6
-                else:
-                    return 3
-        elif collision == 4:
-            _collision = self._get_collision_natural(x - 1, y)
-            if(_collision == 3 or _collision == 6 or _collision == 9):
-                return 5
-            else:
-                return 4
-        elif collision == 6:
-            _collision = self._get_collision_natural(x + 1, y)
-            if(_collision == 1 or _collision == 4 or _collision == 7):
-                return 5
-            else:
-                return 6
-        elif collision == 7:
-            _collision = self._get_collision_natural(x - 1, y)
-            if(_collision == 3 or _collision == 6 or _collision == 9):
-                _collision = self._get_collision_natural(x, y - 1)
-                if(_collision == 1 or _collision == 2 or _collision == 3):
-                    return 5
-                else:
-                    return 8
-            else:
-                _collision = self._get_collision_natural(x, y - 1)
-                if(_collision == 1 or _collision == 2 or _collision == 3):
-                    return 4
-                else:
-                    return 7
-        elif collision == 8:
-            _collision = self._get_collision_natural(x, y - 1)
-            if(_collision == 1 or _collision == 2 or _collision == 3):
-                return 5
-            else:
-                return 8
-        elif collision == 9:
-            _collision = self._get_collision_natural(x + 1, y)
-            if(_collision == 1 or _collision == 4 or _collision == 7):
-                _collision = self._get_collision_natural(x, y - 1)
-                if(_collision == 1 or _collision == 2 or _collision == 3):
-                    return 5
-                else:
-                    return 8
-            else:
-                _collision = self._get_collision_natural(x, y - 1)
-                if(_collision == 1 or _collision == 2 or _collision == 3):
-                    return 6
-                else:
-                    return 9
-        else:
-            return 5
+        up = self._get_collision_natural(x, y - 1).down
+        down = self._get_collision_natural(x, y + 1).up
+        left = self._get_collision_natural(x - 1, y).right
+        right = self._get_collision_natural(x + 1, y).left
+
+        collision._not_ander(left, right, up, down)
+
+        return collision
+
 
 SCREEN_SIZE = (320, 240)
 FPS = 60
@@ -241,7 +184,7 @@ while True:
         for local_y in range(1,14):
             global_y = local_y + player_rect.top
             collision = stage.get_collision(global_x, global_y)
-            if(collision == 6 or collision == 3):
+            if(collision.right and not collision.up):
                 player_rect.move_ip(local_x + 1, 0)
                 wall_left_hit = True
                 player_move_x = 0
@@ -258,7 +201,7 @@ while True:
         for local_y in range(1,14):
             global_y = local_y + player_rect.top
             collision = stage.get_collision(global_x, global_y)
-            if(collision == 4 or collision == 1):
+            if(collision.left and not collision.up):
                 player_rect.move_ip(local_x - 16, 0)
                 wall_left_hit = True
                 player_move_x = 0
@@ -273,7 +216,7 @@ while True:
             global_y = local_y + player_rect.top
             global_left_x = player_rect.left + 7
             global_right_x = global_left_x + 1
-            if(stage.get_collision(global_left_x, global_y) == 8 or stage.get_collision(global_right_x, global_y) == 8):
+            if(stage.get_collision(global_left_x, global_y).up or stage.get_collision(global_right_x, global_y).up):
                 player_on_ground = True
                 player_move_y = 0
                 player_rect.move_ip(0, local_y - 15)
@@ -286,7 +229,7 @@ while True:
                 for local_x in range(16):
                     global_x = local_x + player_rect.left
                     collision = stage.get_collision(global_x, global_y)
-                    if(collision == 7 or collision == 8 or collision == 9):
+                    if(collision.up and (collision.left or collision.right)):
                         player_on_ground = True
                         player_move_y = 0
                         player_rect.move_ip(0, local_y - 15)
@@ -305,7 +248,7 @@ while True:
             for local_x in range(1,15):
                 global_x = local_x + player_rect.left
                 collision = stage.get_collision(global_x, global_y)
-                if(collision == 1 or collision == 2 or collision == 3):
+                if(collision.down):
                     player_move_y = 0
                     player_rect.move_ip(0, local_y)
                     is_break = True

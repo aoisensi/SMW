@@ -7,25 +7,10 @@ class Block_hatena_block(object):
     def get_picture(self):
         return self.image
     def get_collision(self, x, y):
-        if x==0:
-            if y==0:
-                return 7
-            elif y==15:
-                return 1
-            else:
-                return 4
-        elif x==15:
-            if y==0:
-                return 9
-            elif y==15:
-                return 3
-            else:
-                return 6
-        else:
-            if y==0:
-                return 8
-            elif y==15:
-                return 2
-            else:
-                return 5
+        collision = Collision()
+        collision.left = x == 0
+        collision.right = x == 15
+        collision.up = y == 0
+        collision.down = y == 15
+        return collision
 block_class = Block_hatena_block

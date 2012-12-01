@@ -7,11 +7,10 @@ class Block_dirt_ground_right(object):
     def get_picture(self):
         return self.image
     def get_collision(self, x, y):
+        collision = Collision()
         if y == 0:
+            collision.top = True
             if x == 15:
-                return 9
-            else:
-                return 8
-        else:
-            return 5
+                collision.right = True
+        return collision
 block_class = Block_dirt_ground_right

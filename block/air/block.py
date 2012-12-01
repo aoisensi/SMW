@@ -4,5 +4,5 @@ class Block_air(object):
     def get_picture(self):
         return None
     def get_collision(self, x, y):
-        return 5
+        return Collision()
 block_class = Block_air
