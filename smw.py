@@ -176,6 +176,36 @@ while True:
 
     player_rect.move_ip(player_move_x, player_move_y)
 
+    #landing
+    if player_move_y >= 0:
+        for local_y in range(8, 16):
+            global_y = local_y + player_rect.top
+            global_left_x = player_rect.left + 7
+            global_right_x = global_left_x + 1
+            if(stage.get_collision(global_left_x, global_y).up or stage.get_collision(global_right_x, global_y).up):
+                player_on_ground = True
+                player_move_y = 0
+                player_rect.move_ip(0, local_y - 15)
+                break
+        else:
+
+            for local_y in range(8, 16):
+                is_break = False
+                global_y = local_y + player_rect.top
+                for local_x in range(16):
+                    global_x = local_x + player_rect.left
+                    collision = stage.get_collision(global_x, global_y)
+                    if(collision.up and (collision.left or collision.right)):
+                        player_on_ground = True
+                        player_move_y = 0
+                        player_rect.move_ip(0, local_y - 15)
+                        is_break = True
+                        break
+                if is_break:
+                    break
+            else:
+                player_on_ground = False
+
     #wall hit left
     wall_left_hit = False
     for local_x in range(7,-1,-1):
@@ -209,36 +239,6 @@ while True:
                 break
         if is_break:
             break
-
-    #landing
-    if player_move_y >= 0:
-        for local_y in range(8, 16):
-            global_y = local_y + player_rect.top
-            global_left_x = player_rect.left + 7
-            global_right_x = global_left_x + 1
-            if(stage.get_collision(global_left_x, global_y).up or stage.get_collision(global_right_x, global_y).up):
-                player_on_ground = True
-                player_move_y = 0
-                player_rect.move_ip(0, local_y - 15)
-                break
-        else:
-
-            for local_y in range(8, 16):
-                is_break = False
-                global_y = local_y + player_rect.top
-                for local_x in range(16):
-                    global_x = local_x + player_rect.left
-                    collision = stage.get_collision(global_x, global_y)
-                    if(collision.up and (collision.left or collision.right)):
-                        player_on_ground = True
-                        player_move_y = 0
-                        player_rect.move_ip(0, local_y - 15)
-                        is_break = True
-                        break
-                if is_break:
-                    break
-            else:
-                player_on_ground = False
 
     #strike
     if player_move_y <= 0:
