@@ -9,7 +9,7 @@ class Block_dirt_ground_left(object):
     def get_collision(self, x, y):
         collision = Collision()
         if y == 0:
-            collision.top = True
+            collision.up = True
             if x == 0:
                 collision.left = True
         return collision
