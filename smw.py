@@ -32,7 +32,7 @@ class Collision(object):
         self.down = self.down and (not down)
 
 class BlockClasses(object):
-    block_classes = {}   #dictonary <string, class>
+    block_classes = {}   #dict <string, class>
     @staticmethod
     def __init__():
         for name in os.listdir("./block/"):
@@ -43,6 +43,20 @@ class BlockClasses(object):
     @staticmethod
     def get_class(name):
         return BlockClasses.block_classes[name]
+
+class SpriteClasses(object):
+    sprite_classes = {} #dict <string, class>
+    @staticmethod
+    def __init__():
+        for name in os.listdir("./sprite/"):
+            if os.path.isdir("./sprite/"+name):
+                execfile("./sprite/"+name+"/sprite.py", globals())
+                SpriteClasses.sprite_classes[name] = sprite_class
+                print name
+    @staticmethod
+    def get_class(name):
+        return SpriteClasses.sprite_classes[name]
+
 
 class Stage(object):
     stage = []     #list <list <block class>>
@@ -178,7 +192,8 @@ while True:
 
     #landing
     if player_move_y >= 0:
-        for local_y in range(15 - int(player_move_y), 16):
+        player_moving_x = abs(int(player_move_x))
+        for local_y in range(14 - int(player_move_y) - player_moving_x, 16 + player_moving_x ):
             global_y = local_y + player_rect.top
             global_left_x = player_rect.left + 7
             global_right_x = global_left_x + 1
@@ -188,7 +203,6 @@ while True:
                 player_rect.move_ip(0, local_y - 15)
                 break
         else:
-
             for local_y in range(15 - int(player_move_y), 16):
                 is_break = False
                 global_y = local_y + player_rect.top
