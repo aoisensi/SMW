@@ -15,6 +15,13 @@ from pygame.locals import *
 import sys
 import os
 
+def e_callable(obj, name):
+    try:
+        ret = callable(getattr(obj, name))
+    except AttributeError:
+        ret = False
+    return ret
+
 class Collision(object):
     left = False
     right = False
@@ -39,7 +46,8 @@ class BlockClasses(object):
             if os.path.isdir("./block/"+name):
                 execfile("./block/"+name+"/block.py", globals())
                 BlockClasses.block_classes[name] = block_class
-                print name
+                print "  " + name
+        print "have load block classes!!"
     @staticmethod
     def get_class(name):
         return BlockClasses.block_classes[name]
@@ -52,10 +60,12 @@ class SpriteClasses(object):
             if os.path.isdir("./sprite/"+name):
                 execfile("./sprite/"+name+"/sprite.py", globals())
                 SpriteClasses.sprite_classes[name] = sprite_class
-                print name
+                print "  " + name
+        print "have load sprite classes!!"
     @staticmethod
     def get_class(name):
         return SpriteClasses.sprite_classes[name]
+
 
 
 class Stage(object):
@@ -74,6 +84,9 @@ class Stage(object):
         except IndexError:
             return None
 
+    def get_block_global(self, x, y):
+        return self.get_block(int(x/16), int(y/16))
+
     def get_height(self):
         return len(self.stage)
 
@@ -83,8 +96,14 @@ class Stage(object):
     def get_block_pic(self, x, y):
         return self.get_block(x, y).get_picture()
 
+    def get_block_gap(self, x, y):
+        block = self.get_block(x, y)
+        if e_callable(block, 'get_gap'):
+            return block.get_gap()
+        else:
+            return (0,0)
     def _get_collision_natural(self, x, y):
-        block = self.get_block(int(x/16),int(y/16))
+        block = self.get_block_global(x,y)
         if block == None:
             return Collision()
         else:
@@ -101,6 +120,11 @@ class Stage(object):
 
         return collision
 
+    def all_update(self):
+        for block_line in self.stage:
+            for block in block_line:
+                if(e_callable(block, 'update')):
+                    block.update()
 
 SCREEN_SIZE = (320, 240)
 FPS = 60
@@ -144,13 +168,7 @@ while True:
 
     screen.fill((0, 0, 255))
 
-    #render_stage
-    for y in range(0,stage.get_height()):
-        for x in range(0,stage.get_width()):
-            picture = stage.get_block_pic(x, y)
-            if picture != None:
-                screen.blit(picture, picture.get_rect().move(x*16, y*16))
-
+    stage.all_update()
 
     #move_player
     pkeys = pygame.key.get_pressed()
@@ -266,7 +284,19 @@ while True:
                     player_move_y = 0
                     player_rect.move_ip(0, local_y)
                     is_break = True
+                    block = stage.get_block_global(global_x, global_y)
+                    if(e_callable(block, 'event_player_strike')):
+                        block.event_player_strike()
+
                     break
+
+    #render_stage
+    for y in range(0,stage.get_height()):
+        for x in range(0,stage.get_width()):
+            picture = stage.get_block_pic(x, y)
+            gap = stage.get_block_gap(x, y)
+            if picture != None:
+                screen.blit(picture, picture.get_rect().move(x*16 + gap[0], y*16 + gap[1]))
 
 
     screen.blit(player, player_rect)
