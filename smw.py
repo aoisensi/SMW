@@ -178,7 +178,7 @@ while True:
 
     #landing
     if player_move_y >= 0:
-        for local_y in range(8, 16):
+        for local_y in range(15 - int(player_move_y), 16):
             global_y = local_y + player_rect.top
             global_left_x = player_rect.left + 7
             global_right_x = global_left_x + 1
@@ -189,7 +189,7 @@ while True:
                 break
         else:
 
-            for local_y in range(8, 16):
+            for local_y in range(15 - int(player_move_y), 16):
                 is_break = False
                 global_y = local_y + player_rect.top
                 for local_x in range(16):
