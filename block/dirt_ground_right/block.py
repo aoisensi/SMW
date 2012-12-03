@@ -1,12 +1,20 @@
-class Block_dirt_ground_right(object):
+class Block_dirt_ground_right(Block):
     image = None
-    def __init__(self):
-        self.image = pygame.image.load('./block/dirt_ground_right/block.png')
-    def get_name(self):
-        return "dirt_ground_left"
-    def get_picture(self):
-        return self.image
-    def get_collision(self, x, y):
+
+    @staticmethod
+    def load_block():
+        Block_dirt_ground_right.image = pygame.image.load('./block/dirt_ground_right/block.png')
+
+    @staticmethod
+    def get_name():
+        return "dirt_ground_right"
+
+    @staticmethod
+    def get_picture():
+        return Block_dirt_ground_right.image
+
+    @staticmethod
+    def get_collision(x, y):
         collision = Collision()
         if y == 0:
             collision.up = True

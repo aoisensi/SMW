@@ -1,12 +1,17 @@
-class Block_dirt_under_middle(object):
+class Block_dirt_under_middle(Block):
     image = None
-    def __init__(self):
-        self.image = pygame.image.load('./block/dirt_under_middle/block.png')
-    def get_name(self):
+
+    @staticmethod
+    def load_block():
+        Block_dirt_under_middle.image = pygame.image.load('./block/dirt_under_middle/block.png')
+
+    @staticmethod
+    def get_name():
         return "dirt_under_middle"
-    def get_picture(self):
-        return self.image
-    def get_collision(self, x, y):
-        collision = Collision()
-        return collision
+
+    @staticmethod
+    def get_picture():
+        return Block_dirt_under_middle.image
+
+
 block_class = Block_dirt_under_middle

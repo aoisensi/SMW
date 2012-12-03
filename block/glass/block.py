@@ -1,12 +1,17 @@
-class Block_glass(object):
+class Block_glass(Block):
     image = None
-    def __init__(self):
-        self.image = pygame.image.load('./block/glass/glass.png')
-    def get_name(self):
+
+    @staticmethod
+    def load_block():
+        Block_glass.image = pygame.image.load('./block/glass/glass.png')
+
+    @staticmethod
+    def get_name():
         return "glass"
-    def get_picture(self):
-        return self.image
-    def get_collision(self, x, y):
-        collision = Collision()
-        return collision
+
+    @staticmethod
+    def get_picture():
+        return Block_glass.image
+
+
 block_class = Block_glass

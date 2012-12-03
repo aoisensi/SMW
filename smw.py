@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+﻿#-------------------------------------------------------------------------------
 # Name:        module1
 # Purpose:
 #
@@ -9,7 +9,7 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 import pygame
 from pygame.locals import *
 import sys
@@ -38,6 +38,35 @@ class Collision(object):
         self.up = self.up and (not up)
         self.down = self.down and (not down)
 
+class Block(object):
+    stage = None
+    picture = None
+    #どこのマス目にあるか
+    #タプル型で(x,y)
+    cell = None
+
+    def __init__(self, stage, cell):
+        self.cell = cell
+        self.stage = stage
+
+    @staticmethod
+    def get_name():
+        return None
+
+    @staticmethod
+    def load_block():
+        return None
+
+    @staticmethod
+    def get_picture():
+		pass
+
+    @staticmethod
+    def get_collision(x, y):
+        return Collision()
+
+
+
 class BlockClasses(object):
     block_classes = {}   #dict <string, class>
     @staticmethod
@@ -45,6 +74,7 @@ class BlockClasses(object):
         for name in os.listdir("./block/"):
             if os.path.isdir("./block/"+name):
                 execfile("./block/"+name+"/block.py", globals())
+                block_class.load_block()
                 BlockClasses.block_classes[name] = block_class
                 print "  " + name
         print "have load block classes!!"
@@ -71,11 +101,12 @@ class SpriteClasses(object):
 class Stage(object):
     stage = []     #list <list <block class>>
     def __init__(self, path):
-        for stage_date_line in open(path):
+        for y, stage_date_line in enumerate(open(path)):
             stage_line = []
             stage_date_line = stage_date_line.rstrip()
-            for stage_date_block in stage_date_line.split(' '):
-                stage_line.append(BlockClasses.get_class(stage_date_block)())
+            for x, stage_date_block in enumerate(stage_date_line.split(' ')):
+                block = BlockClasses.get_class(stage_date_block)
+                stage_line.append(block(self, (x, y)))
             self.stage.append(stage_line)
 
     def get_block(self, x, y):
