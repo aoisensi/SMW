@@ -42,5 +42,8 @@ class Block_hatena_block(Block):
     def event_player_strike(self):
         if(self.turn == 0):
             self.turn = 1
+            id = self.stage.sprite_added()
+            self.stage.spawn(Sprite_kinoko(id, self.stage, (self.cell[0]*16, (self.cell[1] - 1) * 16 + 1)))
+
 
 block_class = Block_hatena_block

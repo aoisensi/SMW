@@ -65,6 +65,23 @@ class Block(object):
     def get_collision(x, y):
         return Collision()
 
+class Sprite(object):
+    stage = None
+    id = None
+
+    @staticmethod
+    def get_name():
+        return None
+
+    @staticmethod
+    def load_sprite(stage):
+        Sprite.stage = stage
+
+    @staticmethod
+    def render():
+        return None
+
+
 
 
 class BlockClasses(object):
@@ -89,6 +106,7 @@ class SpriteClasses(object):
         for name in os.listdir("./sprite/"):
             if os.path.isdir("./sprite/"+name):
                 execfile("./sprite/"+name+"/sprite.py", globals())
+                sprite_class.load_sprite()
                 SpriteClasses.sprite_classes[name] = sprite_class
                 print "  " + name
         print "have load sprite classes!!"
@@ -100,6 +118,7 @@ class SpriteClasses(object):
 
 class Stage(object):
     stage = []     #list <list <block class>>
+    sprite = []
     def __init__(self, path):
         for y, stage_date_line in enumerate(open(path)):
             stage_line = []
@@ -157,6 +176,13 @@ class Stage(object):
                 if(e_callable(block, 'update')):
                     block.update()
 
+    def sprite_added(self):
+        return self.sprite.count
+
+    def spawn(self, sprite):
+        self.sprite.append(sprite)
+
+
 SCREEN_SIZE = (320, 240)
 FPS = 60
 
@@ -169,10 +195,10 @@ screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Window")
 
 player = pygame.image.load("player.png")
-player.set_colorkey((255,255,255))
 player_rect = player.get_rect()
 
-BlockClasses() #load class
+BlockClasses() #load block class
+SpriteClasses() #load sprite class
 
 stage = Stage("stage.txt")
 
@@ -329,7 +355,10 @@ while True:
             if picture != None:
                 screen.blit(picture, picture.get_rect().move(x*16 + gap[0], y*16 + gap[1]))
 
-
+    #render_sprite
+    for sprite in stage.sprite:
+        sprite_render = sprite.render()
+        screen.blit(sprite_render[0], sprite_render[1])
     screen.blit(player, player_rect)
 
     pygame.display.update()
