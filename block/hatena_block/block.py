@@ -34,16 +34,14 @@ class Block_hatena_block(Block):
         collision.down = y == 15
         return collision
 
-
     def get_gap(self):
         return (0, abs(int(self.turn / 2) - 5) - 5)
-
 
     def event_player_strike(self):
         if(self.turn == 0):
             self.turn = 1
             id = self.stage.sprite_added()
-            self.stage.spawn(Sprite_kinoko(id, self.stage, (self.cell[0]*16, (self.cell[1] - 1) * 16 + 1)))
+            self.stage.spawn(Sprite_kinoko(id, self.stage, (self.cell[0]*16, (self.cell[1] - 1) * 16)))
 
 
 block_class = Block_hatena_block

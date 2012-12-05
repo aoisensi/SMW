@@ -81,6 +81,10 @@ class Sprite(object):
     def render():
         return None
 
+    @staticmethod
+    def update():
+        pass
+
 
 
 
@@ -175,6 +179,9 @@ class Stage(object):
             for block in block_line:
                 if(e_callable(block, 'update')):
                     block.update()
+
+        for sprite in self.sprite:
+            sprite.update()
 
     def sprite_added(self):
         return self.sprite.count
